@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -145,6 +147,12 @@ public final class ResourceServlet extends HttpServlet {
                 if (isValidFile(file, loadDir)) {
                     url = file.getCanonicalFile().toURI().toURL();
                 }
+            }
+
+            // Validate the constructed URL against the allowed list
+            if (url != null && !isAllowedURL(url)) {
+                res.sendError(HttpServletResponse.SC_FORBIDDEN, "Access to the requested resource is forbidden.");
+                return;
             }
 
             if (url == null) {
@@ -300,5 +308,20 @@ public final class ResourceServlet extends HttpServlet {
     private boolean isValidFile(File file, String loadDir) throws IOException {
         return file.getCanonicalPath().startsWith(new File(loadDir).getCanonicalPath())
                 && file.exists() && !file.isDirectory();
+    }
+
+    private static final List<String> ALLOWED_DIRECTORIES = Arrays.asList(
+            "/allowed/dir1",
+            "/allowed/dir2"
+    );
+
+    private boolean isAllowedURL(URL url) throws IOException {
+        String fullURL = url.toString();
+        for (String allowedDir : ALLOWED_DIRECTORIES) {
+            if (fullURL.startsWith(allowedDir)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
