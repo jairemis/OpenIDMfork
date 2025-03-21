@@ -316,9 +316,9 @@ public final class ResourceServlet extends HttpServlet {
     );
 
     private boolean isAllowedURL(URL url) throws IOException {
-        String canonicalPath = new File(url.getPath()).getCanonicalPath();
+        String fullURL = url.toString();
         for (String allowedDir : ALLOWED_DIRECTORIES) {
-            if (canonicalPath.startsWith(new File(allowedDir).getCanonicalPath())) {
+            if (fullURL.startsWith(allowedDir)) {
                 return true;
             }
         }
