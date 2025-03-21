@@ -137,14 +137,12 @@ public final class ResourceServlet extends HttpServlet {
             URL url = null;
             String loadDir = (String) PropertyUtil.substVars(extensionDir, IdentityServer.getInstance(), false);
             File file = new File(loadDir + target);
-            if (file.getCanonicalPath().startsWith(new File(loadDir).getCanonicalPath())
-                    && file.exists() && !file.isDirectory()) {
+            if (isValidFile(file, loadDir)) {
                 url = file.getCanonicalFile().toURI().toURL();
             } else {
                 loadDir = (String) PropertyUtil.substVars(defaultDir, IdentityServer.getInstance(), false);
                 file = new File(loadDir + target);
-                if (file.getCanonicalPath().startsWith(new File(loadDir).getCanonicalPath())
-                        && file.exists() && !file.isDirectory()) {
+                if (isValidFile(file, loadDir)) {
                     url = file.getCanonicalFile().toURI().toURL();
                 }
             }
@@ -299,4 +297,8 @@ public final class ResourceServlet extends HttpServlet {
         return path.startsWith("/") ? path : "/" + path;
     }
 
+    private boolean isValidFile(File file, String loadDir) throws IOException {
+        return file.getCanonicalPath().startsWith(new File(loadDir).getCanonicalPath())
+                && file.exists() && !file.isDirectory();
+    }
 }
